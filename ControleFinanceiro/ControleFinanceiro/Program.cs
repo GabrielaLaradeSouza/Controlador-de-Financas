@@ -7,16 +7,18 @@ namespace ControleFinanceiro
     {
         static void Main(string[] args)
         {
+            // Conecta com banco de dados
             SqlConnection sqlCon = new SqlConnection("Database=controle_Financas;Server=BAUER-PC;user=sa;password=sa");
             sqlCon.Open();
 
+            // Zera variaveis globais
             int codigo = 0;
             int procedimentoPrincipal = 1;
             int subProcedimento = 0;
             int terProcedimento = 0;
 
             string contaCabecalho = "";
-
+            
             Console.WriteLine("Bem vindo ao Controle Financeiro!");
             while (procedimentoPrincipal > 0)
             {
@@ -27,6 +29,9 @@ namespace ControleFinanceiro
                 Console.WriteLine("0 - Encerar Programa");
                 procedimentoPrincipal = Convert.ToInt32(Console.ReadLine());
 
+                // procedimento principal controla do looping do menu principal,
+                // acessar ou gerir contas
+                
                 if (procedimentoPrincipal == 1)
                 {
                     do
@@ -41,6 +46,7 @@ namespace ControleFinanceiro
                         Console.WriteLine("0 - Voltar para menu principal");
                         subProcedimento = Convert.ToInt32(Console.ReadLine());
 
+                        // sub procdimento controla os menus secundarios
                         if (subProcedimento == 1)
                         {
                             // FUNCAO DE INCLUSÃO
@@ -109,17 +115,22 @@ namespace ControleFinanceiro
                                 Console.WriteLine("0 - Retornar ao menu da conta");
                                 terProcedimento = Convert.ToInt32(Console.ReadLine());
 
+                                //ter procedimento controla o submenu
                                 switch (terProcedimento) {
                                     case 1:
+                                    // inclusao
                                         criaRegistroReceita(codigo, sqlCon);
                                         break;
                                     case 2:
+                                    //alteracao
                                         alteraRegistroReceitas(codigo, sqlCon);
                                         break;
                                     case 3:
+                                    // exclusao
                                         excluirRegistroReceitas(codigo, sqlCon);
                                         break;
                                     case 0:
+                                    // volta pro menu acima
                                         Console.WriteLine("Voltando...");
                                         break;
                                     default:
@@ -919,8 +930,10 @@ namespace ControleFinanceiro
             float receitas = 0.0f;
             float descontos = 0.0f;
 
+            // funcao sera executada sempre que incluido/aterado/excluido uma receita ou despesa
             try
             {
+             // busca as receitas
                 SqlCommand command = new SqlCommand("SELECT valor FROM dbo.Receita " +
                     "where conta = " + conta, sqlCon);
                 SqlDataReader reader = command.ExecuteReader();
@@ -936,6 +949,7 @@ namespace ControleFinanceiro
             }
             try
             {
+             // busca dos descontos
                 SqlCommand command = new SqlCommand("SELECT valor FROM dbo.Descontos " +
                     "where conta = " + conta, sqlCon);
                 SqlDataReader reader = command.ExecuteReader();
@@ -952,6 +966,7 @@ namespace ControleFinanceiro
 
             try
             {
+            // atualiza o valor de saldo da conta
                 SqlCommand command = new SqlCommand("UPDATE dbo.Contas " +
                     " SET Saldo = (" + receitas + " - " + descontos + ")" +
                     " WHERE codigo = " + conta, sqlCon);

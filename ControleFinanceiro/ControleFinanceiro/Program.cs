@@ -105,7 +105,7 @@ namespace ControleFinanceiro
                                 Console.WriteLine("Informe o processo desejado:");
                                 Console.WriteLine("1 - Incluir Receita");
                                 Console.WriteLine("2 - Alterar Receita");
-                                Console.WriteLine("3 - Excluir Receita");                                
+                                Console.WriteLine("3 - Excluir Receita");
                                 Console.WriteLine("0 - Retornar ao menu da conta");
                                 terProcedimento = Convert.ToInt32(Console.ReadLine());
 
@@ -144,10 +144,13 @@ namespace ControleFinanceiro
                                 switch (terProcedimento)
                                 {
                                     case 1:
+                                        criaRegistroDespesas(codigo, sqlCon);
                                         break;
                                     case 2:
+                                        alteraRegistroDespesas(codigo, sqlCon);
                                         break;
                                     case 3:
+                                        excluirRegistroDespesas(codigo, sqlCon);
                                         break;
                                     case 0:
                                         Console.WriteLine("Voltando...");
@@ -157,7 +160,7 @@ namespace ControleFinanceiro
                                         Console.ReadLine();
                                         break;
                                 }
-                            } while (terProcedimento > 0) ;
+                            } while (terProcedimento > 0);
                         else if (subProcedimento == 3)
                         {
                             do
@@ -172,13 +175,13 @@ namespace ControleFinanceiro
 
                                 switch (terProcedimento) {
                                     case 1:
-
+                                        listaReceitasPorData(codigo, sqlCon);
                                         break;
                                     case 2:
-
+                                        listaReceitasPorTipo(codigo, sqlCon);
                                         break;
                                     case 3:
-
+                                        listaReceitas(codigo, sqlCon);
                                         break;
                                     case 0:
                                         Console.WriteLine("Voltando...");
@@ -188,9 +191,9 @@ namespace ControleFinanceiro
                                         Console.ReadLine();
                                         break;
                                 }
-                                
+
                             } while (terProcedimento > 0);
-                            
+
                         }
                         else if (subProcedimento == 4)
                         {
@@ -207,13 +210,13 @@ namespace ControleFinanceiro
                                 switch (terProcedimento)
                                 {
                                     case 1:
-
+                                        listaDespesasPorData(codigo, sqlCon);
                                         break;
                                     case 2:
-
+                                        listaDespesasPorTipo(codigo, sqlCon);
                                         break;
                                     case 3:
-
+                                        listaDespesas(codigo, sqlCon);
                                         break;
                                     case 0:
                                         Console.WriteLine("Voltando...");
@@ -232,21 +235,16 @@ namespace ControleFinanceiro
                             Console.Clear();
                             Console.WriteLine("Conta Ativa: " + contaCabecalho + "\n");
                             Console.WriteLine("O Saldo total da conta é de: " + retornaTotalConta(codigo, sqlCon));
-                            Console.WriteLine("Receitas: ");
-                            // Funcao que retorna todas as receitas
-                            Console.WriteLine("Descontos: ");
-                            // Funcao que retorna todos os descontos
-
                             Console.WriteLine("Procedimento Concluído! Precione enter para prosseguir!");
                             Console.ReadLine();
                         }
-                        else if(subProcedimento > 5){
+                        else if (subProcedimento > 5) {
                             Console.WriteLine("Procedimento inválido! Precione enter para prosseguir!");
                             Console.ReadLine();
                         }
                     } while (subProcedimento > 0);
                 }
-                else 
+                else
                 {
                     Console.WriteLine("Encerrando....");
                 }
@@ -271,14 +269,11 @@ namespace ControleFinanceiro
             Console.WriteLine("Informe a instuição financeira da Conta:");
             banco = Console.ReadLine();
 
-            Console.WriteLine("Informe o saldo atual da conta: ");
-            saldo = float.Parse(Console.ReadLine());
-
             try
             {
                 SqlCommand command = new SqlCommand("INSERT INTO dbo.Contas " +
-                    " (codigo, tipoConta, instituicaoFinanceira, saldo)" +
-                    " values (" + conta + ",'" + tipoConta + "','" + banco + "'," + saldo + ")", sqlCon);
+                    " (codigo, tipoConta, instituicaoFinanceira)" +
+                    " values (" + conta + ",'" + tipoConta + "','" + banco + "')", sqlCon);
                 command.ExecuteNonQuery();
                 Console.WriteLine("Conta incluida com sucesso! Precione enter para voltar ao menu das contas");
                 Console.ReadLine();
@@ -309,14 +304,10 @@ namespace ControleFinanceiro
             Console.WriteLine("Informe a nova instuição financeira da Conta:");
             banco = Console.ReadLine();
 
-            Console.WriteLine("Informe o saldo atual da conta: ");
-            saldo = float.Parse(Console.ReadLine());
-
             try
             {
                 SqlCommand command = new SqlCommand("UPDATE dbo.Contas " +
-                    " SET tipoConta = '" + tipoConta + "', instituicaoFinanceira = '" + banco + "', saldo = " + saldo +
-                    " where codigo = " + conta, sqlCon);
+                    " SET tipoConta = '" + tipoConta + "', instituicaoFinanceira = '" + banco + "' where codigo = " + conta, sqlCon);
                 command.ExecuteNonQuery();
                 Console.WriteLine("Conta alterada com sucesso! Precione enter para voltar ao menu das contas");
                 Console.ReadLine();
@@ -448,17 +439,18 @@ namespace ControleFinanceiro
             try
             {
                 SqlCommand command = new SqlCommand("INSERT INTO dbo.Receita " +
-                    " (conta, descricao, dataRecebimentoEsperado, dataRecebimento, tipoRecebimento, valor)" + 
+                    " (conta, descricao, dataRecebimentoEsperado, dataRecebimento, tipoRecebimento, valor)" +
                     " VALUES (" + conta + ",'" + descricao + "','" + dataRecebimentoEsperado +
                     "','" + dataRecebimento + "','" + tipoRecebimento + "'," + valor + ")", sqlCon);
                 command.ExecuteNonQuery();
-                Console.WriteLine("Receita incluida com sucesso! Precione enter para voltar ao menu das contas");
+                atualizaSaldo(conta, sqlCon);
+                Console.WriteLine("Receita incluida com sucesso! Precione enter para voltar ao menu das receitas");
                 Console.ReadLine();
                 Console.Clear();
             }
             catch (SqlException)
             {
-                Console.WriteLine("Erro no momento da criação! Receita não foi incluida! Precine Enter para retornar ao menu das contas!");
+                Console.WriteLine("Erro no momento da criação! Receita não foi incluida! Precine Enter para retornar ao menu das receitas!");
                 Console.ReadLine();
                 Console.Clear();
             }
@@ -473,17 +465,17 @@ namespace ControleFinanceiro
             DateTime dataRecebimentoEsperado;
 
             Console.Clear();
-            Console.WriteLine("Informe a data de Esperada do recebimento:");
-            dataRecebimentoEsperado = Convert.ToDateTime(Console.ReadLine());
-
-            Console.WriteLine("Informe a data do recebimento: ");
+            Console.WriteLine("Informe a data do recebimento a ser alterado - Formato (Ano/Mes/Ano): ");
             dataRecebimento = Convert.ToDateTime(Console.ReadLine());
+
+            Console.WriteLine("Informe o tipo da receita a ser alterado:");
+            tipoRecebimento = Console.ReadLine();
+
+            Console.WriteLine("Informe a data de Esperada do recebimento - Formato (Ano/Mes/Ano):");
+            dataRecebimentoEsperado = Convert.ToDateTime(Console.ReadLine());
 
             Console.WriteLine("Informe a Descrição da receita:");
             descricao = Console.ReadLine();
-
-            Console.WriteLine("Informe o tipo da receita:");
-            tipoRecebimento = Console.ReadLine();
 
             Console.WriteLine("Informe o valor da receita: ");
             valor = float.Parse(Console.ReadLine());
@@ -491,26 +483,26 @@ namespace ControleFinanceiro
             try
             {
                 SqlCommand command = new SqlCommand("UPDATE dbo.Receita " +
-                    " SET tipoReceita = '" + tipoRecebimento + 
-                    "', dataRecebimentoEsperado = '" + dataRecebimentoEsperado +
-                    "', dataRecebimento = '" + dataRecebimento +
+                    " SET dataRecebimentoEsperado = '" + dataRecebimentoEsperado +
                     "', descricao = '" + dataRecebimento +
-                    "', tipoRecebimento = '" + dataRecebimento +
                     "', valor = " + valor +
-                    " WHERE conta = " + conta, sqlCon);
+                    " WHERE conta = " + conta +
+                    " AND dataRecebimento = '" + dataRecebimento + "' AND " +
+                    "tipoRecebimento = '" + tipoRecebimento + "'", sqlCon);
                 command.ExecuteNonQuery();
-                Console.WriteLine("Receita alterada com sucesso! Precione enter para voltar ao menu das contas");
+                atualizaSaldo(conta, sqlCon);
+                Console.WriteLine("Receita alterada com sucesso! Precione enter para voltar ao menu das receitas");
                 Console.ReadLine();
                 Console.Clear();
             }
             catch (SqlException)
             {
-                Console.WriteLine("Erro no momento da alteração! Receita não foi alterada! Precine Enter para retornar ao menu das contas!");
+                Console.WriteLine("Erro no momento da alteração! Receita não foi alterada! Precine Enter para retornar ao menu das receitas!");
                 Console.ReadLine();
                 Console.Clear();
             }
         }
-        private static void excluirRegistroReceitas(int codigo,SqlConnection sqlCon) {
+        private static void excluirRegistroReceitas(int codigo, SqlConnection sqlCon) {
 
             Console.Clear();
             Console.WriteLine("Informe a data da receita que deseja excluir - Formato (Ano/Mes/Dia): ");
@@ -521,17 +513,18 @@ namespace ControleFinanceiro
             try
             {
                 SqlCommand command = new SqlCommand("DELETE FROM dbo.Receita " +
-                    " WHERE codigo = " + codigo +
-                    " AND " + dataRecebimento +
-                    " AND " + tipoReceita, sqlCon);
+                    " WHERE conta = " + codigo +
+                    " AND dataRecebimento = '" + dataRecebimento + "'" +
+                    " AND tipoRecebimento = '" + tipoReceita + "'", sqlCon);
                 command.ExecuteNonQuery();
-                Console.WriteLine("Receita excluida com sucesso! Precione enter para voltar ao menu das contas");
+                atualizaSaldo(codigo, sqlCon);
+                Console.WriteLine("Receita excluida com sucesso! Precione enter para voltar ao menu das receitas");
                 Console.ReadLine();
                 Console.Clear();
             }
             catch (SqlException)
             {
-                Console.WriteLine("Erro no momento da excluida! Receita não foi excluida! Precine Enter para retornar ao menu das contas!");
+                Console.WriteLine("Erro no momento da excluida! Receita não foi excluida! Precine Enter para retornar ao menu das receitas!");
                 Console.ReadLine();
                 Console.Clear();
             }
@@ -548,9 +541,9 @@ namespace ControleFinanceiro
             try
             {
                 SqlCommand command = new SqlCommand("SELECT * FROM dbo.Receita " +
-                    "where codigo = " + codigo + 
-                    " and dataRecebimento >= " + dataInicial +
-                    " and dataRecebimento <= " + dataFinal, sqlCon);
+                    "where conta = " + codigo +
+                    " and dataRecebimento >= '" + dataInicial +
+                    "' and dataRecebimento <= '" + dataFinal + "'", sqlCon);
                 SqlDataReader reader = command.ExecuteReader();
                 Console.WriteLine("Conta: " + codigo);
                 Console.WriteLine("--------------------------");
@@ -559,25 +552,417 @@ namespace ControleFinanceiro
                     sqlReturn = "Data de recebimento: " + reader["DataRecebimento"].ToString() + "\n";
                     sqlReturn += "Data do recebimento esperado: " + reader["dataRecebimentoEsperado"].ToString() + "\n";
                     sqlReturn += "Descrição: " + reader["Descricao"].ToString() + "\n";
-                    sqlReturn += "Tipo da receita: " + reader["tipoReceita"].ToString() + "\n";
+                    sqlReturn += "Tipo da receita: " + reader["tipoRecebimento"].ToString() + "\n";
                     sqlReturn += "Valor: " + reader["valor"].ToString() + "\n";
                     Console.WriteLine(sqlReturn);
                 }
                 reader.Close();
-                Console.WriteLine("Precione enter para voltar ao menu das contas");
+                Console.WriteLine("Precione enter para voltar ao menu das receitas");
                 Console.ReadLine();
                 Console.Clear();
             }
             catch (SqlException)
             {
-                Console.WriteLine("Erro no retorno das contas! Precine Enter para retornar ao menu das contas!");
+                Console.WriteLine("Erro no retorno das receitas! Precine Enter para retornar ao menu das receitas!");
+                Console.ReadLine();
+                Console.Clear();
+            }
+        }
+
+        private static void listaReceitasPorTipo(int codigo, SqlConnection sqlCon)
+        {
+            string sqlReturn = "";
+
+            Console.Clear();
+            Console.WriteLine("Informe o tipo da receita que deseja pesquisar:");
+            string tipoReceita = Console.ReadLine();
+            try
+            {
+                SqlCommand command = new SqlCommand("SELECT * FROM dbo.Receita " +
+                    "where conta = " + codigo +
+                    " and tipoRecebimento = '" + tipoReceita + "'", sqlCon);
+                SqlDataReader reader = command.ExecuteReader();
+                Console.WriteLine("Conta: " + codigo);
+                Console.WriteLine("--------------------------");
+                while (reader.Read())
+                {
+                    sqlReturn = "Data de recebimento: " + reader["DataRecebimento"].ToString() + "\n";
+                    sqlReturn += "Data do recebimento esperado: " + reader["dataRecebimentoEsperado"].ToString() + "\n";
+                    sqlReturn += "Descrição: " + reader["Descricao"].ToString() + "\n";
+                    sqlReturn += "Tipo da receita: " + reader["tipoRecebimento"].ToString() + "\n";
+                    sqlReturn += "Valor: " + reader["valor"].ToString() + "\n";
+                    Console.WriteLine(sqlReturn);
+                }
+                reader.Close();
+                Console.WriteLine("Precione enter para voltar ao menu das receitas");
+                Console.ReadLine();
+                Console.Clear();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no retorno das receitas! Precione Enter para retornar ao menu das receitas!");
+                Console.ReadLine();
+                Console.Clear();
+            }
+        }
+
+        private static void listaReceitas(int codigo, SqlConnection sqlCon)
+        {
+            string sqlReturn = "";
+
+            Console.Clear();
+            try
+            {
+                SqlCommand command = new SqlCommand("SELECT * FROM dbo.Receita " +
+                    "where conta = " + codigo, sqlCon);
+                SqlDataReader reader = command.ExecuteReader();
+                Console.WriteLine("Conta: " + codigo);
+                Console.WriteLine("--------------------------");
+                while (reader.Read())
+                {
+                    sqlReturn = "Data de recebimento: " + reader["DataRecebimento"].ToString() + "\n";
+                    sqlReturn += "Data do recebimento esperado: " + reader["dataRecebimentoEsperado"].ToString() + "\n";
+                    sqlReturn += "Descrição: " + reader["Descricao"].ToString() + "\n";
+                    sqlReturn += "Tipo da receita: " + reader["tipoRecebimento"].ToString() + "\n";
+                    sqlReturn += "Valor: " + reader["valor"].ToString() + "\n";
+                    Console.WriteLine(sqlReturn);
+                }
+                reader.Close();
+                Console.WriteLine("Precione enter para voltar ao menu das receitas");
+                Console.ReadLine();
+                Console.Clear();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no retorno das receitas! Precine Enter para retornar ao menu das receitas!");
+                Console.ReadLine();
+                Console.Clear();
+            }
+        }
+
+        private static void criaRegistroDespesas(int conta, SqlConnection sqlCon)
+        {
+
+            string tipoDespesa = "";
+            string descricao = "";
+            float valor = 0.0f;
+            DateTime dataDespesa;
+            DateTime dataDespesaEsperada;
+
+            Console.Clear();
+            Console.WriteLine("Informe a data de Esperada da despesa - formato(Ano/Mes/Dia):");
+            dataDespesaEsperada = Convert.ToDateTime(Console.ReadLine());
+
+            Console.WriteLine("Informe a data da despesa - formato(Ano/Mes/Dia): ");
+            dataDespesa = Convert.ToDateTime(Console.ReadLine());
+
+            Console.WriteLine("Informe o tipo da despesa:");
+            tipoDespesa = Console.ReadLine();
+
+            Console.WriteLine("Informe o valor da despesa: ");
+            valor = float.Parse(Console.ReadLine());
+
+            try
+            {
+                SqlCommand command = new SqlCommand("INSERT INTO dbo.Descontos " +
+                    " (conta, dataPagamentoEsperado, dataPagamento, tipoDespesa, valor)" +
+                    " VALUES (" + conta + ",'" + dataDespesaEsperada +
+                    "','" + dataDespesa + "','" + tipoDespesa + "'," + valor + ")", sqlCon);
+                command.ExecuteNonQuery();
+                atualizaSaldo(conta, sqlCon);
+                Console.WriteLine("Despesa incluida com sucesso! Precione enter para voltar ao menu das contas");
+                Console.ReadLine();
+                Console.Clear();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no momento da criação! Despesa não foi incluida! Precine Enter para retornar ao menu das contas!");
+                Console.ReadLine();
+                Console.Clear();
+            }
+
+        }
+
+        private static void alteraRegistroDespesas(int conta, SqlConnection sqlCon)
+        {
+            string tipoDesconto = "";
+            string descricao = "";
+            float valor = 0.0f;
+            DateTime dataPagamento;
+            DateTime dataPagamentoEsperado;
+
+            Console.Clear();
+            Console.WriteLine("Informe a data do pagamento - Formato (Ano/Mes/Dia):");
+            dataPagamento = Convert.ToDateTime(Console.ReadLine());
+
+            Console.WriteLine("Informe o tipo da despesa:");
+            tipoDesconto = Console.ReadLine();
+
+            Console.WriteLine("Informe a data de Esperada do pagamento - Formato (Ano/Mes/Dia):");
+            dataPagamentoEsperado = Convert.ToDateTime(Console.ReadLine());
+
+            Console.WriteLine("Informe o valor da despesa: ");
+            valor = float.Parse(Console.ReadLine());
+
+            try
+            {
+                SqlCommand command = new SqlCommand("UPDATE dbo.Descontos " +
+                    " SET dataPagamentoEsperado = '" + dataPagamentoEsperado +
+                    "', valor = " + valor +
+                    " WHERE conta = " + conta + " AND dataPagamento = '" + dataPagamento +
+                    "' AND tipoDespesa = '" + tipoDesconto + "'", sqlCon);
+                command.ExecuteNonQuery();
+                atualizaSaldo(conta, sqlCon);
+                Console.WriteLine("Despesa alterada com sucesso! Precione enter para voltar ao menu das despesas");
+                Console.ReadLine();
+                Console.Clear();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no momento da alteração! Despesa não foi alterada! Precine Enter para retornar ao menu das despesas!");
+                Console.ReadLine();
+                Console.Clear();
+            }
+        }
+
+        private static void excluirRegistroDespesas(int codigo, SqlConnection sqlCon)
+        {
+
+            Console.Clear();
+            Console.WriteLine("Informe a data da despesa que deseja excluir - Formato (Ano/Mes/Dia): ");
+            DateTime dataPagamento = Convert.ToDateTime(Console.ReadLine());
+
+            Console.WriteLine("Informe o tipo da despesa que deseja excluir:");
+            string tipoDespesa = Console.ReadLine();
+            try
+            {
+                SqlCommand command = new SqlCommand("DELETE FROM dbo.Descontos " +
+                    " WHERE conta = " + codigo +
+                    " AND dataPagamento = '" + dataPagamento + "'" +
+                    " AND tipoDespesa = '" + tipoDespesa + "'", sqlCon);
+                command.ExecuteNonQuery();
+                atualizaSaldo(codigo, sqlCon);
+                Console.WriteLine("Receita excluida com sucesso! Precione enter para voltar ao menu das despesas");
+                Console.ReadLine();
+                Console.Clear();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no momento da excluida! Receita não foi excluida! Precine Enter para retornar ao menu das despesas!");
+                Console.ReadLine();
+                Console.Clear();
+            }
+        }
+        private static void listaDespesasPorData(int codigo, SqlConnection sqlCon)
+        {
+            string sqlReturn = "";
+
+            Console.Clear();
+            Console.WriteLine("Informe o inicio do período que deseja pesquisar - Formato (Ano/Mes/Dia)");
+            DateTime dataInicial = Convert.ToDateTime(Console.ReadLine());
+            Console.WriteLine("Informe o final do período que deseja pesquisar - Formato (Ano/Mes/Dia:");
+            DateTime dataFinal = Convert.ToDateTime(Console.ReadLine());
+            try
+            {
+                SqlCommand command = new SqlCommand("SELECT * FROM dbo.Descontos " +
+                    "where conta = " + codigo +
+                    " and dataPagamento >= '" + dataInicial +
+                    "' and dataPagamento <= '" + dataFinal + "'", sqlCon);
+                SqlDataReader reader = command.ExecuteReader();
+                Console.WriteLine("Conta: " + codigo);
+                Console.WriteLine("--------------------------");
+                while (reader.Read())
+                {
+                    sqlReturn = "Data de pagamento: " + reader["DataPagamento"].ToString() + "\n";
+                    sqlReturn += "Data do pagamento esperado: " + reader["dataPagamentoEsperado"].ToString() + "\n";
+                    sqlReturn += "Tipo da Despesa: " + reader["tipoDespesa"].ToString() + "\n";
+                    sqlReturn += "Valor: " + reader["valor"].ToString() + "\n";
+                    Console.WriteLine(sqlReturn);
+                }
+                reader.Close();
+                Console.WriteLine("Precione enter para voltar ao menu das despesas");
+                Console.ReadLine();
+                Console.Clear();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no retorno das despesas! Precine Enter para retornar ao menu das despesas!");
+                Console.ReadLine();
+                Console.Clear();
+            }
+        }
+
+        private static void listaDespesasPorTipo(int codigo, SqlConnection sqlCon)
+        {
+            string sqlReturn = "";
+
+            Console.Clear();
+            Console.WriteLine("Informe o tipo da despesa que deseja pesquisar:");
+            string tipoDespesa = Console.ReadLine();
+            try
+            {
+                SqlCommand command = new SqlCommand("SELECT * FROM dbo.Descontos " +
+                    "where conta = " + codigo +
+                    " and tipoDespesa = '" + tipoDespesa + "'", sqlCon);
+                SqlDataReader reader = command.ExecuteReader();
+                Console.WriteLine("Conta: " + codigo);
+                Console.WriteLine("--------------------------");
+                while (reader.Read())
+                {
+                    sqlReturn = "Data de pagamento: " + reader["DataPagamento"].ToString() + "\n";
+                    sqlReturn += "Data do pagamento esperado: " + reader["dataPagamentoEsperado"].ToString() + "\n";
+                    sqlReturn += "Tipo da Despesa: " + reader["tipoDespesa"].ToString() + "\n";
+                    sqlReturn += "Valor: " + reader["valor"].ToString() + "\n";
+                    Console.WriteLine(sqlReturn);
+                }
+                reader.Close();
+                Console.WriteLine("Precione enter para voltar ao menu das despesas");
+                Console.ReadLine();
+                Console.Clear();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no retorno das despesas! Precine Enter para retornar ao menu das despesas!");
+                Console.ReadLine();
+                Console.Clear();
+            }
+        }
+        private static void listaDespesas(int codigo, SqlConnection sqlCon)
+        {
+            string sqlReturn = "";
+
+            Console.Clear();
+            try
+            {
+                SqlCommand command = new SqlCommand("SELECT * FROM dbo.Descontos " +
+                    "where conta = " + codigo, sqlCon);
+                SqlDataReader reader = command.ExecuteReader();
+                Console.WriteLine("Conta: " + codigo);
+                Console.WriteLine("--------------------------");
+                while (reader.Read())
+                {
+                    sqlReturn = "Data de Pagamento: " + reader["DataPagamento"].ToString() + "\n";
+                    sqlReturn += "Data do Pagamento esperado: " + reader["DataPagamentoEsperado"].ToString() + "\n";
+                    sqlReturn += "Tipo do desconto: " + reader["tipoDespesa"].ToString() + "\n";
+                    sqlReturn += "Valor: " + reader["valor"].ToString() + "\n";
+                    Console.WriteLine(sqlReturn);
+                }
+                reader.Close();
+                Console.WriteLine("Precione enter para voltar ao menu das despesas");
+                Console.ReadLine();
+                Console.Clear();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no retorno das despesas! Precine Enter para retornar ao menu das despesas!");
                 Console.ReadLine();
                 Console.Clear();
             }
         }
 
         private static float retornaTotalConta(int codigo, SqlConnection sqlCon) {
-            return 0.0f;
+            string sqlReturn = "";
+            float total = 0.0f;
+            Console.Clear();
+            Console.WriteLine("Conta: " + codigo);
+            Console.WriteLine("--------------------------");
+            Console.WriteLine("Receitas: ");
+            try
+            {
+                SqlCommand command = new SqlCommand("SELECT * FROM dbo.Receita " +
+                    "where conta = " + codigo, sqlCon);
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    sqlReturn = "Data de Recebimento: " + reader["DataRecebimento"].ToString() + "\n";
+                    sqlReturn += "Tipo da Receita: " + reader["tipoRecebimento"].ToString() + "\n";
+                    sqlReturn += "Valor: " + reader["valor"].ToString() + "\n";
+                    total += float.Parse(reader["valor"].ToString());
+                    Console.WriteLine(sqlReturn);
+                }
+                reader.Close();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no retorno do extrato total! Precione Enter para retornar ao menu das contas!");
+                Console.ReadLine();
+                Console.Clear();
+            }
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine("Despesas:");
+            try
+            {
+                SqlCommand command = new SqlCommand("SELECT * FROM dbo.Descontos " +
+                    "where conta = " + codigo, sqlCon);
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    sqlReturn = "Data de Pagamento: " + reader["DataPagamento"].ToString() + "\n";
+                    sqlReturn += "Tipo do desconto: " + reader["tipoDespesa"].ToString() + "\n";
+                    sqlReturn += "Valor: " + reader["valor"].ToString() + "\n";
+                    total -= float.Parse(reader["valor"].ToString());
+                    Console.WriteLine(sqlReturn);
+                }
+                reader.Close();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no retorno do extrato total! Precione Enter para retornar ao menu das contas!");
+                Console.ReadLine();
+                Console.Clear();
+            }
+
+            return total;
+        }
+
+        private static void atualizaSaldo(int conta, SqlConnection sqlCon) {
+            float receitas = 0.0f;
+            float descontos = 0.0f;
+
+            try
+            {
+                SqlCommand command = new SqlCommand("SELECT valor FROM dbo.Receita " +
+                    "where conta = " + conta, sqlCon);
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    receitas += float.Parse(reader["valor"].ToString());
+                }
+                reader.Close();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no retorno das receitas!");
+            }
+            try
+            {
+                SqlCommand command = new SqlCommand("SELECT valor FROM dbo.Descontos " +
+                    "where conta = " + conta, sqlCon);
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    descontos -= float.Parse(reader["valor"].ToString());
+                }
+                reader.Close();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro no retorno das despesas!");
+            }
+
+            try
+            {
+                SqlCommand command = new SqlCommand("UPDATE dbo.Contas " +
+                    " SET Saldo = (" + receitas + " - " + descontos + ")" +
+                    " WHERE codigo = " + conta, sqlCon);
+                command.ExecuteNonQuery();
+            }
+            catch (SqlException)
+            {
+                Console.WriteLine("Erro na Atualização do saldo!");
+                Console.ReadLine();
+                Console.Clear();
+            }
         }
     }
     

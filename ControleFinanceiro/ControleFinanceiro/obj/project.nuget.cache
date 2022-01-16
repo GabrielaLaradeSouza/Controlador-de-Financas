@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "vK1bzgM3EI7agAhn+cz+c9Df+IarS80lXKo96eFXmWf821/S6ZZJzR9IKsk5YuyS+ovdGgeq12zzIbMNl4h+0Q==",
+  "dgSpecHash": "p9eHFKAXHHpqYgKJ87xSRcJocCIS3cGDUbFwIOW6zpSnGps79hL8TRfgjvbzx4Q/b6xgJIcIUJhpzsHMGpcWow==",
   "success": true,
-  "projectFilePath": "C:\\Users\\tiago\\source\\repos\\ControleFinanceiro\\ControleFinanceiro\\ControleFinanceiro.csproj",
+  "projectFilePath": "C:\\Users\\tiago\\Documents\\GitHub\\Controlador-de-Financas\\ControleFinanceiro\\ControleFinanceiro\\ControleFinanceiro.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\tiago\\.nuget\\packages\\azure.core\\1.6.0\\azure.core.1.6.0.nupkg.sha512",
     "C:\\Users\\tiago\\.nuget\\packages\\azure.identity\\1.3.0\\azure.identity.1.3.0.nupkg.sha512",
